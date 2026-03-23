@@ -1,5 +1,5 @@
 // Service Worker — Tutor R & RStudio PWA
-const CACHE_NAME = 'tutor-r-v1';
+const CACHE_NAME = 'tutor-r-v2';
 const ASSETS = [
   './',
   './index.html',
