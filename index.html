@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1a5276">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tutor R">
+<meta name="description" content="Tutor interactivo para aprender R y RStudio desde cero, orientado a profesionales de ciencias de la salud">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>Tutor R & RStudio — Aprende desde cero</title>
+<style>
+:root {
+  --azul:#1a5276;--azul-claro:#2980b9;--gris-fondo:#f4f6f9;--gris-borde:#dce1e8;
+  --blanco:#ffffff;--texto:#2c3e50;--texto-sec:#5d6d7e;--verde:#27ae60;
+  --rojo:#c0392b;--naranja:#e67e22;--radius:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.5;background:var(--gris-fondo);color:var(--texto);-webkit-text-size-adjust:100%}
+header{background:var(--azul);color:#fff;padding:1rem 2rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 8px rgba(0,0,0,.15);position:sticky;top:0;z-index:100}
+header h1{font-size:1.4rem;font-weight:600}
+header .subtitle{font-size:.85rem;opacity:.8}
+header .btn-info{margin-left:auto;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
+header .btn-info:hover{background:rgba(255,255,255,.25)}
+.hamburger{display:none;background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;flex-shrink:0}
+.app-layout{display:flex;min-height:calc(100vh - 60px)}
+.sidebar{width:280px;background:var(--blanco);border-right:1px solid var(--gris-borde);overflow-y:auto;flex-shrink:0;padding:1rem 0}
+.sidebar-section{padding:.5rem 1.2rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--texto-sec);margin-top:.5rem}
+.sidebar-item{display:flex;align-items:center;gap:.6rem;padding:.55rem 1.2rem;cursor:pointer;font-size:.88rem;color:var(--texto);transition:background .15s;border-left:3px solid transparent}
+.sidebar-item:hover{background:var(--gris-fondo)}
+.sidebar-item.active{background:#eaf2f8;border-left-color:var(--azul-claro);color:var(--azul);font-weight:600}
+.sidebar-item .check{width:18px;height:18px;border-radius:50%;border:2px solid var(--gris-borde);display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;transition:all .2s}
+.sidebar-item .check.done{background:var(--verde);border-color:var(--verde);color:#fff}
+.sidebar-item .check.done::after{content:'✓'}
+.progress-bar-container{padding:.8rem 1.2rem;border-bottom:1px solid var(--gris-borde);margin-bottom:.5rem}
+.progress-label{font-size:.75rem;font-weight:600;color:var(--texto-sec);margin-bottom:.4rem;display:flex;justify-content:space-between}
+.progress-track{height:6px;background:var(--gris-borde);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--verde);border-radius:3px;transition:width .4s ease}
+.main-content{flex:1;padding:2rem;max-width:800px;overflow-y:auto}
+.lesson-header{margin-bottom:1.5rem}
+.lesson-header .module-tag{display:inline-block;background:#eaf2f8;color:var(--azul);padding:.2rem .7rem;border-radius:12px;font-size:.75rem;font-weight:600;margin-bottom:.5rem}
+.lesson-header h2{font-size:1.5rem;font-weight:700;color:var(--azul)}
+.lesson-header .lesson-desc{font-size:.92rem;color:var(--texto-sec);margin-top:.3rem}
+.content-section{background:var(--blanco);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.content-section h3{font-size:1.1rem;font-weight:700;color:var(--azul);margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+.content-section p{margin-bottom:.8rem;font-size:.92rem}
+.content-section ul,.content-section ol{margin:.5rem 0 .8rem 1.5rem;font-size:.92rem}
+.content-section li{margin-bottom:.3rem}
+.code-block{position:relative;background:#1e1e2e;border-radius:var(--radius);margin:.8rem 0;overflow:hidden}
+.code-block-header{display:flex;align-items:center;justify-content:space-between;background:#313244;padding:.4rem .8rem;font-size:.72rem;color:#a6adc8;text-transform:uppercase;letter-spacing:.04em}
+.btn-copy{background:none;border:1px solid rgba(255,255,255,.15);color:#a6adc8;padding:.2rem .5rem;border-radius:4px;cursor:pointer;font-size:.7rem;transition:all .2s}
+.btn-copy:hover{background:rgba(255,255,255,.1);color:#fff}
+.btn-copy.copied{background:var(--verde);color:#fff;border-color:var(--verde)}
+pre.code-content{padding:1rem;overflow-x:auto;font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:.85rem;line-height:1.6;color:#cdd6f4;white-space:pre}
+.kw{color:#cba6f7}.fn{color:#89b4fa}.st{color:#a6e3a1}.num{color:#fab387}.cm{color:#6c7086;font-style:italic}.op{color:#89dceb}.arg{color:#f9e2af}
+.output-block{background:#f8f9fa;border:1px solid var(--gris-borde);border-left:3px solid var(--verde);border-radius:var(--radius);padding:.8rem 1rem;margin:.5rem 0;font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:.82rem;color:var(--texto);white-space:pre-wrap;overflow-x:auto}
+.tip-box{border-radius:var(--radius);padding:.8rem 1rem;margin:.8rem 0;font-size:.88rem;display:flex;gap:.5rem;align-items:flex-start}
+.tip-box.info{background:#d6eaf8;color:#1a5276}.tip-box.success{background:#d5f5e3;color:#1e8449}.tip-box.warning{background:#fdebd0;color:#b9770e}.tip-box.danger{background:#fadbd8;color:#922b21}
+.tip-box .icon{font-size:1.1rem;flex-shrink:0}
+.img-placeholder{background:#eaf2f8;border:2px dashed var(--azul-claro);border-radius:var(--radius);padding:2rem;color:var(--azul);font-size:.85rem;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.img-placeholder .icon{font-size:2rem}
+.quiz-container{background:#fef9e7;border:1px solid #f9e79f;border-radius:var(--radius);padding:1.2rem;margin:1rem 0}
+.quiz-container h4{font-size:.95rem;font-weight:700;color:#7d6608;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem}
+.quiz-option{display:block;padding:.5rem .8rem;margin:.3rem 0;border:1px solid #f0e4b8;border-radius:var(--radius);cursor:pointer;font-size:.88rem;transition:all .2s;background:var(--blanco)}
+.quiz-option:hover{background:#fef5d4;border-color:#e6c619}
+.quiz-option.correct{background:#d5f5e3;border-color:var(--verde);color:#1e8449}
+.quiz-option.incorrect{background:#fadbd8;border-color:var(--rojo);color:#922b21}
+.quiz-option.disabled{pointer-events:none;opacity:.7}
+.quiz-feedback{margin-top:.6rem;padding:.6rem .8rem;border-radius:var(--radius);font-size:.85rem;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.correct{background:#d5f5e3;color:#1e8449}
+.quiz-feedback.incorrect{background:#fadbd8;color:#922b21}
+.exercise-box{background:#eaf2f8;border:1px solid #aed6f1;border-radius:var(--radius);padding:1.2rem;margin:1rem 0}
+.exercise-box h4{font-size:.95rem;font-weight:700;color:var(--azul);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.exercise-box p{font-size:.88rem}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--gris-borde)}
+.btn{padding:.6rem 1.2rem;border:none;border-radius:var(--radius);font-size:.95rem;cursor:pointer;font-weight:500;transition:background .2s;display:flex;align-items:center;gap:.4rem}
+.btn-primary{background:var(--azul-claro);color:#fff}.btn-primary:hover{background:var(--azul)}
+.btn-secondary{background:var(--gris-borde);color:var(--texto)}.btn-secondary:hover{background:#c5ccd6}
+.btn-success{background:var(--verde);color:#fff}.btn-success:hover{background:#219a52}
+.shortcuts-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.5rem 0}
+.shortcuts-table th{background:var(--gris-fondo);text-align:left;padding:.5rem .65rem;font-size:.75rem;text-transform:uppercase;color:var(--texto-sec);letter-spacing:.03em}
+.shortcuts-table td{padding:.5rem .65rem;border-bottom:1px solid var(--gris-borde)}
+.kbd{display:inline-block;background:var(--gris-fondo);border:1px solid var(--gris-borde);border-radius:4px;padding:.1rem .4rem;font-family:'SF Mono',Consolas,monospace;font-size:.8rem;font-weight:600;box-shadow:0 1px 0 rgba(0,0,0,.1)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--blanco);border-radius:var(--radius);max-width:500px;width:90%;padding:1.5rem;box-shadow:0 8px 30px rgba(0,0,0,.2);max-height:80vh;overflow-y:auto}
+.modal-box h3{font-size:1.1rem;font-weight:700;color:var(--azul);margin-bottom:1rem}
+.modal-box p{font-size:.9rem;margin-bottom:.6rem}
+.modal-close{float:right;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--texto-sec)}
+.modal-close:hover{color:var(--texto)}
+.modal-footer{margin-top:1.2rem;padding-top:.8rem;border-top:1px solid var(--gris-borde);font-size:.82rem;color:var(--texto-sec);text-align:center}
+.modal-footer a{color:var(--azul-claro);text-decoration:none;font-weight:600}
+.modal-footer a:hover{text-decoration:underline}
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.8rem 0}
+.compare-table th{background:var(--azul);color:#fff;padding:.6rem;text-align:left;font-size:.8rem}
+.compare-table td{padding:.5rem .6rem;border-bottom:1px solid var(--gris-borde)}
+.compare-table tr:nth-child(even){background:var(--gris-fondo)}
+.welcome-card{background:linear-gradient(135deg,var(--azul) 0%,var(--azul-claro) 100%);color:#fff;border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem;text-align:center}
+.welcome-card h2{font-size:1.5rem;margin-bottom:.5rem}
+.welcome-card p{opacity:.9;font-size:.95rem}
+.welcome-card .start-btn{display:inline-block;margin-top:1rem;background:#fff;color:var(--azul);padding:.7rem 2rem;border-radius:var(--radius);font-weight:600;cursor:pointer;border:none;font-size:1rem;transition:transform .2s}
+.welcome-card .start-btn:hover{transform:scale(1.03)}
+@media(max-width:768px){
+  header{padding:.8rem 1rem}.hamburger{display:block}
+  .sidebar{position:fixed;left:-300px;top:60px;bottom:0;z-index:99;box-shadow:2px 0 8px rgba(0,0,0,.15);transition:left .3s ease;width:280px}
+  .sidebar.open{left:0}
+  .sidebar-backdrop{position:fixed;inset:0;top:60px;background:rgba(0,0,0,.3);z-index:98;display:none}
+  .sidebar-backdrop.show{display:block}
+  .main-content{padding:1.2rem}
+  .lesson-nav{flex-direction:column;gap:.5rem}
+  .lesson-nav .btn{justify-content:center}
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.main-content{animation:fadeIn .3s ease}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+  <div>
+    <h1>Tutor R & RStudio</h1>
+    <span class="subtitle">Aprende desde cero — Guía interactiva paso a paso</span>
+  </div>
+  <button class="btn-info" onclick="openModal('info-modal')" title="Información">ℹ</button>
+</header>
+
+<div class="app-layout">
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="progress-bar-container">
+      <div class="progress-label">
+        <span>Tu progreso</span>
+        <span id="progressPercent">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="sidebar-section">Introducción</div>
+    <div class="sidebar-item" data-lesson="welcome" onclick="goTo('welcome')"><span class="check" id="check-welcome"></span><span>Bienvenida</span></div>
+    <div class="sidebar-item" data-lesson="m1" onclick="goTo('m1')"><span class="check" id="check-m1"></span><span>1. ¿Qué es R y RStudio?</span></div>
+    <div class="sidebar-item" data-lesson="m2" onclick="goTo('m2')"><span class="check" id="check-m2"></span><span>2. Instalar R y RStudio</span></div>
+    <div class="sidebar-section">Primeros pasos</div>
+    <div class="sidebar-item" data-lesson="m3" onclick="goTo('m3')"><span class="check" id="check-m3"></span><span>3. La interfaz de RStudio</span></div>
+    <div class="sidebar-item" data-lesson="m4" onclick="goTo('m4')"><span class="check" id="check-m4"></span><span>4. La consola: tu calculadora</span></div>
+    <div class="sidebar-item" data-lesson="m5" onclick="goTo('m5')"><span class="check" id="check-m5"></span><span>5. Variables y asignación</span></div>
+    <div class="sidebar-section">Datos básicos</div>
+    <div class="sidebar-item" data-lesson="m6" onclick="goTo('m6')"><span class="check" id="check-m6"></span><span>6. Tipos de datos</span></div>
+    <div class="sidebar-item" data-lesson="m7" onclick="goTo('m7')"><span class="check" id="check-m7"></span><span>7. Vectores</span></div>
+    <div class="sidebar-item" data-lesson="m8" onclick="goTo('m8')"><span class="check" id="check-m8"></span><span>8. Data frames</span></div>
+    <div class="sidebar-section">Trabajo práctico</div>
+    <div class="sidebar-item" data-lesson="m9" onclick="goTo('m9')"><span class="check" id="check-m9"></span><span>9. Paquetes (packages)</span></div>
+    <div class="sidebar-item" data-lesson="m10" onclick="goTo('m10')"><span class="check" id="check-m10"></span><span>10. Importar datos</span></div>
+    <div class="sidebar-item" data-lesson="m11" onclick="goTo('m11')"><span class="check" id="check-m11"></span><span>11. Estadística descriptiva</span></div>
+    <div class="sidebar-item" data-lesson="m12" onclick="goTo('m12')"><span class="check" id="check-m12"></span><span>12. Gráficos básicos</span></div>
+    <div class="sidebar-section">Flujo de trabajo</div>
+    <div class="sidebar-item" data-lesson="m13" onclick="goTo('m13')"><span class="check" id="check-m13"></span><span>13. Scripts y proyectos</span></div>
+    <div class="sidebar-item" data-lesson="m14" onclick="goTo('m14')"><span class="check" id="check-m14"></span><span>14. Atajos y productividad</span></div>
+    <div class="sidebar-item" data-lesson="m15" onclick="goTo('m15')"><span class="check" id="check-m15"></span><span>15. Dónde buscar ayuda</span></div>
+    <div class="sidebar-section">Referencia</div>
+    <div class="sidebar-item" data-lesson="ref" onclick="goTo('ref')"><span class="check" id="check-ref"></span><span>📖 Guía rápida de comandos</span></div>
+  </nav>
+
+  <main class="main-content" id="mainContent"></main>
+</div>
+
+<div class="modal-overlay" id="info-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('info-modal')">✕</button>
+    <h3>Acerca de esta aplicación</h3>
+    <p>Esta herramienta es un <strong>tutor interactivo</strong> diseñado para aprender R y RStudio desde cero. El contenido está orientado a profesionales de ciencias de la salud que se inician en el análisis de datos con R.</p>
+    <p>El curso está organizado en <strong>15 módulos progresivos</strong> que cubren desde la instalación hasta los flujos de trabajo avanzados. Cada módulo incluye explicaciones, ejemplos de código y ejercicios prácticos.</p>
+    <p>Tu progreso se guarda automáticamente en tu navegador. Puedes retomar el curso donde lo dejaste en cualquier momento.</p>
+    <div class="tip-box warning" style="margin-top:.8rem">
+      <span class="icon">⚠️</span>
+      <span>Esta herramienta es un apoyo al aprendizaje y no sustituye la documentación oficial de R ni la práctica directa en RStudio. Para un aprendizaje efectivo, es fundamental que ejecutes los ejemplos en tu propio RStudio.</span>
+    </div>
+    <div class="modal-footer">
+      <span>Aplicación creada por </span>
+      <a href="https://www.linkedin.com/in/emilio-monte-boquet" target="_blank" rel="noopener">EMB</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Helpers ──
+function codeBlock(lang, code) {
+  return '<div class="code-block"><div class="code-block-header"><span>' + lang + '</span><button class="btn-copy">Copiar</button></div><pre class="code-content">' + code + '</pre></div>';
+}
+function quiz(id, question, options, explanation) {
+  var h = '<div class="quiz-container" id="' + id + '" data-explanation="' + explanation.replace(/"/g,'&quot;') + '">';
+  h += '<h4>🧩 Pregunta de repaso</h4>';
+  h += '<p style="margin-bottom:.6rem;font-size:.9rem;font-weight:500">' + question + '</p>';
+  for (var i = 0; i < options.length; i++) {
+    h += '<div class="quiz-option" data-correct="' + options[i].correct + '">' + String.fromCharCode(65+i) + ') ' + options[i].text + '</div>';
+  }
+  h += '<div class="quiz-feedback"></div></div>';
+  return h;
+}
+function tip(type, icon, text) { return '<div class="tip-box ' + type + '"><span class="icon">' + icon + '</span><span>' + text + '</span></div>'; }
+function output(text) { return '<div class="output-block">' + text + '</div>'; }
+function exercise(text) { return '<div class="exercise-box"><h4>✏️ Ejercicio práctico</h4>' + text + '</div>'; }
+
+// ── Contenido de los módulos ──
+// Cada content() es una función que devuelve HTML como string.
+// Usamos concatenación de strings (+) para evitar problemas con template literals anidados.
+
+var lessons = {
+welcome: { tag:'Inicio', title:'Bienvenida al Tutor de R', desc:'Todo lo que necesitas saber antes de empezar', content: function(){
+  return '<div class="welcome-card"><h2>🎓 ¡Bienvenido/a!</h2><p>Vas a aprender R y RStudio paso a paso, desde cero absoluto.<br>No necesitas experiencia previa en programación.</p><button class="start-btn" onclick="goTo(\'m1\')">Empezar el curso →</button></div>' +
+  '<div class="content-section"><h3>📋 ¿Qué vas a aprender?</h3><p>Este tutor está diseñado específicamente para profesionales de ciencias de la salud que quieren iniciarse en R. Al completar los 15 módulos serás capaz de:</p><ul>' +
+  '<li><strong>Instalar y configurar</strong> R y RStudio en tu ordenador</li>' +
+  '<li><strong>Escribir código R básico</strong>: variables, vectores, data frames</li>' +
+  '<li><strong>Importar datos</strong> desde Excel, CSV y otros formatos</li>' +
+  '<li><strong>Calcular estadísticas descriptivas</strong> de tus datos</li>' +
+  '<li><strong>Crear gráficos</strong> para visualizar resultados</li>' +
+  '<li><strong>Organizar tu trabajo</strong> con scripts y proyectos</li>' +
+  '<li><strong>Buscar ayuda</strong> cuando te quedes atascado/a</li></ul></div>' +
+  '<div class="content-section"><h3>💡 Consejos para sacar el máximo partido</h3>' +
+  tip('success','✅','<strong>Practica en RStudio:</strong> No te limites a leer. Abre RStudio y escribe tú mismo/a cada ejemplo de código. La práctica es la clave.') +
+  tip('info','📝','<strong>Sigue el orden:</strong> Los módulos están pensados de forma progresiva. Cada uno se apoya en lo aprendido en los anteriores.') +
+  tip('warning','🔁','<strong>Repite si es necesario:</strong> Es normal no entender todo a la primera. Vuelve a los módulos anteriores si lo necesitas.') + '</div>' +
+  '<div class="content-section"><h3>⏱ ¿Cuánto tiempo lleva?</h3><p>Cada módulo está pensado para completarse en <strong>10-20 minutos</strong>. Puedes avanzar a tu ritmo y tu progreso se guarda automáticamente.</p></div>';
+}},
+
+m1: { tag:'Módulo 1', title:'¿Qué es R y RStudio?', desc:'Entiende qué son estas herramientas y por qué las necesitas', content: function(){
+  return '<div class="content-section"><h3>🔬 ¿Qué es R?</h3>' +
+  '<p><strong>R</strong> es un lenguaje de programación creado específicamente para el análisis estadístico y la visualización de datos. Es <strong>gratuito</strong> y de código abierto.</p>' +
+  '<p>Piensa en R como una calculadora enormemente potente: le das instrucciones escritas (código) y R ejecuta cálculos, crea gráficos o analiza datos por ti.</p>' +
+  tip('info','🏥','R es uno de los lenguajes más usados en investigación biomédica, epidemiología y ciencias de la salud. Muchos artículos científicos usan R para sus análisis.') + '</div>' +
+  '<div class="content-section"><h3>🖥 ¿Qué es RStudio?</h3>' +
+  '<p><strong>RStudio</strong> es un programa que te facilita trabajar con R. Es como un "entorno de trabajo" que organiza todo lo que necesitas en una sola pantalla.</p><p>La diferencia es importante:</p>' +
+  '<table class="compare-table"><tr><th>R</th><th>RStudio</th></tr>' +
+  '<tr><td>El <strong>motor</strong> (hace los cálculos)</td><td>El <strong>coche</strong> (la interfaz cómoda)</td></tr>' +
+  '<tr><td>Lenguaje de programación</td><td>Entorno de desarrollo (IDE)</td></tr>' +
+  '<tr><td>Se instala primero</td><td>Se instala después</td></tr>' +
+  '<tr><td>Podría usarse solo (pero es incómodo)</td><td>Necesita que R esté instalado</td></tr></table>' +
+  tip('success','💡','<strong>Analogía:</strong> R es como el motor de un coche y RStudio es el salpicadero, el volante y los pedales. Necesitas ambos: el motor para que funcione, y el salpicadero para conducir cómodamente.') + '</div>' +
+  '<div class="content-section"><h3>🤔 ¿Por qué R y no Excel?</h3><p>Excel es una herramienta excelente, pero R ofrece ventajas importantes para la investigación:</p><ul>' +
+  '<li><strong>Reproducibilidad:</strong> Tu análisis queda guardado como código. Puedes repetirlo exactamente igual meses después.</li>' +
+  '<li><strong>Potencia:</strong> R maneja millones de datos sin problemas. Excel tiene límites.</li>' +
+  '<li><strong>Análisis avanzados:</strong> Métodos estadísticos que Excel no incluye.</li>' +
+  '<li><strong>Gráficos profesionales:</strong> Visualizaciones de calidad publicación.</li>' +
+  '<li><strong>Gratuito:</strong> No necesitas licencia.</li></ul></div>' +
+  quiz('q1','¿Cuál es la relación entre R y RStudio?',[{text:'Son exactamente lo mismo',correct:false},{text:'R es el lenguaje/motor y RStudio es la interfaz que lo hace más fácil de usar',correct:true},{text:'RStudio es una versión mejorada que reemplaza a R',correct:false},{text:'R solo funciona en Mac y RStudio en Windows',correct:false}],'Correcto: R es el motor de cálculo y RStudio es el entorno de trabajo que lo rodea para hacerlo más cómodo.');
+}},
+
+m2: { tag:'Módulo 2', title:'Instalar R y RStudio', desc:'Guía paso a paso para tener todo listo en tu ordenador', content: function(){
+  return '<div class="content-section"><h3>📥 Paso 1: Instalar R</h3><p>Primero debes instalar R (el motor). Sigue estos pasos:</p><ol>' +
+  '<li>Ve a la web oficial: <strong>https://cran.r-project.org</strong></li>' +
+  '<li>Haz clic en el enlace de tu sistema operativo:<ul>' +
+  '<li><strong>Windows:</strong> "Download R for Windows" → "base" → descarga el instalador .exe</li>' +
+  '<li><strong>Mac:</strong> "Download R for macOS" → descarga el archivo .pkg adecuado para tu procesador (Apple Silicon o Intel)</li></ul></li>' +
+  '<li>Ejecuta el instalador y acepta las opciones por defecto</li></ol>' +
+  tip('info','💡','No necesitas cambiar ninguna opción durante la instalación. Los valores por defecto funcionan bien.') + '</div>' +
+  '<div class="content-section"><h3>📥 Paso 2: Instalar RStudio</h3><ol>' +
+  '<li>Ve a: <strong>https://posit.co/download/rstudio-desktop/</strong></li>' +
+  '<li>La web detecta tu sistema operativo automáticamente. Haz clic en el botón grande de descarga.</li>' +
+  '<li>Ejecuta el instalador y acepta los valores por defecto</li></ol>' +
+  tip('warning','⚠️','<strong>Importante:</strong> Siempre instala R primero y RStudio después. RStudio necesita encontrar R para funcionar.') + '</div>' +
+  '<div class="content-section"><h3>✅ Paso 3: Verificar la instalación</h3>' +
+  '<p>Abre RStudio (no abras R directamente, siempre usa RStudio). Verás que se abre una ventana con varios paneles. En el panel inferior izquierdo (Consola) verás un texto de bienvenida con la versión de R.</p>' +
+  '<p>Escribe esto en la consola y pulsa Enter:</p>' +
+  codeBlock('R','1 + 1') +
+  '<p>Si ves el resultado:</p>' + output('[1] 2') +
+  '<p>¡Enhorabuena! Tu instalación funciona correctamente.</p>' +
+  tip('success','🎉','El <code>[1]</code> que aparece antes del resultado es simplemente R indicando que es el primer elemento de la respuesta. Lo verás siempre. No te preocupes por él.') + '</div>' +
+  exercise('<p>1. Instala R desde cran.r-project.org</p><p>2. Instala RStudio desde posit.co</p><p>3. Abre RStudio y escribe <code>1 + 1</code> en la consola</p><p>4. Comprueba que obtienes <code>[1] 2</code> como resultado</p>');
+}},
+
+m3: { tag:'Módulo 3', title:'La interfaz de RStudio', desc:'Conoce las cuatro áreas principales de RStudio', content: function(){
+  return '<div class="content-section"><h3>🖥 Los 4 paneles de RStudio</h3><p>Cuando abres RStudio ves la pantalla dividida en cuatro zonas. Cada una tiene una función:</p>' +
+  '<div class="img-placeholder"><span class="icon">📐</span><span>Esquema de la interfaz de RStudio</span>' +
+  '<div style="text-align:left;font-family:monospace;font-size:.82rem;width:100%;max-width:420px;margin-top:.8rem;line-height:1.6">' +
+  '┌─────────────────┬──────────────────┐<br>│                 │   ENVIRONMENT    │<br>│   EDITOR DE     │   (Variables,    │<br>│   CÓDIGO        │    datos)        │<br>│   (Scripts)     │                  │<br>│                 ├──────────────────┤<br>│                 │   FILES / PLOTS  │<br>├─────────────────┤   HELP /         │<br>│   CONSOLA       │   PACKAGES       │<br>│   (Ejecutar     │   (Archivos,     │<br>│    código)      │    gráficos,     │<br>│                 │    ayuda)        │<br>└─────────────────┴──────────────────┘</div></div></div>' +
+  '<div class="content-section"><h3>1️⃣ Editor de código (arriba-izquierda)</h3><p>Aquí escribes y guardas tu código R en archivos llamados <strong>scripts</strong> (archivos .R). Es como un documento de texto donde vas escribiendo las instrucciones.</p>' +
+  tip('info','💡','Este panel puede no aparecer al inicio. Se abre cuando creas un nuevo script: <strong>File → New File → R Script</strong> (o <span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">N</span>).') + '</div>' +
+  '<div class="content-section"><h3>2️⃣ Consola (abajo-izquierda)</h3><p>Es donde R ejecuta el código y muestra los resultados. Puedes escribir código directamente aquí, pero normalmente lo escribirás en el Editor y lo enviarás a la Consola para que se ejecute.</p><p>El símbolo <code>&gt;</code> indica que R está listo para recibir instrucciones.</p></div>' +
+  '<div class="content-section"><h3>3️⃣ Environment / Entorno (arriba-derecha)</h3><p>Muestra todas las variables y datos que tienes cargados en memoria. Cuando crees una variable o importes un dataset, aparecerá aquí.</p></div>' +
+  '<div class="content-section"><h3>4️⃣ Files / Plots / Help (abajo-derecha)</h3><p>Este panel tiene varias pestañas:</p><ul>' +
+  '<li><strong>Files:</strong> Explorador de archivos de tu proyecto</li>' +
+  '<li><strong>Plots:</strong> Aquí aparecen los gráficos que crees</li>' +
+  '<li><strong>Packages:</strong> Lista de paquetes instalados</li>' +
+  '<li><strong>Help:</strong> Documentación de ayuda</li></ul></div>' +
+  quiz('q3','¿Dónde se muestran los resultados cuando ejecutas código en RStudio?',[{text:'En el Editor de código',correct:false},{text:'En la pestaña Files',correct:false},{text:'En la Consola',correct:true},{text:'En el Environment',correct:false}],'Correcto. La Consola es donde R ejecuta el código y muestra los resultados.');
+}},
+
+m4: { tag:'Módulo 4', title:'La consola: tu calculadora', desc:'Usa R como una calculadora científica potente', content: function(){
+  return '<div class="content-section"><h3>🧮 R como calculadora</h3><p>La forma más sencilla de empezar con R es usarlo como una calculadora. Escribe operaciones en la consola y pulsa Enter:</p>' +
+  codeBlock('R',
+  '<span class="cm"># Suma</span>\n<span class="num">5</span> <span class="op">+</span> <span class="num">3</span>\n\n' +
+  '<span class="cm"># Resta</span>\n<span class="num">10</span> <span class="op">-</span> <span class="num">4</span>\n\n' +
+  '<span class="cm"># Multiplicación (usa el asterisco *)</span>\n<span class="num">6</span> <span class="op">*</span> <span class="num">7</span>\n\n' +
+  '<span class="cm"># División</span>\n<span class="num">20</span> <span class="op">/</span> <span class="num">4</span>\n\n' +
+  '<span class="cm"># Potencia (2 elevado a 3)</span>\n<span class="num">2</span><span class="op">^</span><span class="num">3</span>') +
+  output('[1] 8\n[1] 6\n[1] 42\n[1] 5\n[1] 8') + '</div>' +
+  '<div class="content-section"><h3>📐 Funciones matemáticas</h3><p>R incluye muchas funciones matemáticas. Una función es una instrucción que ejecuta una acción. Se escribe el nombre seguido de paréntesis:</p>' +
+  codeBlock('R',
+  '<span class="cm"># Raíz cuadrada</span>\n<span class="fn">sqrt</span>(<span class="num">16</span>)\n\n' +
+  '<span class="cm"># Valor absoluto</span>\n<span class="fn">abs</span>(<span class="op">-</span><span class="num">5</span>)\n\n' +
+  '<span class="cm"># Logaritmo natural</span>\n<span class="fn">log</span>(<span class="num">100</span>)\n\n' +
+  '<span class="cm"># Logaritmo en base 10</span>\n<span class="fn">log10</span>(<span class="num">100</span>)\n\n' +
+  '<span class="cm"># Redondear</span>\n<span class="fn">round</span>(<span class="num">3.14159</span>, <span class="arg">digits</span> <span class="op">=</span> <span class="num">2</span>)') +
+  output('[1] 4\n[1] 5\n[1] 4.60517\n[1] 2\n[1] 3.14') + '</div>' +
+  '<div class="content-section"><h3>💬 Comentarios en el código</h3><p>Todo lo que escribas después de un <code>#</code> es un <strong>comentario</strong>. R lo ignora completamente. Los comentarios sirven para explicar qué hace tu código:</p>' +
+  codeBlock('R','<span class="cm"># Esto es un comentario, R lo ignora</span>\n<span class="num">5</span> <span class="op">+</span> <span class="num">3</span>  <span class="cm"># Esto también es un comentario</span>') +
+  tip('success','💡','<strong>Buena práctica:</strong> Comenta tu código siempre. Tu yo del futuro te lo agradecerá cuando vuelvas a leer el código semanas después.') + '</div>' +
+  exercise('<ol><li>¿Cuánto es 123 × 456?</li><li>¿Cuál es la raíz cuadrada de 144?</li><li>Redondea el número 2.71828 a 3 decimales</li></ol>') +
+  quiz('q4','¿Qué símbolo se usa en R para los comentarios?',[{text:'// (doble barra)',correct:false},{text:'# (almohadilla/numeral)',correct:true},{text:'/* ... */ (barra asterisco)',correct:false},{text:'-- (doble guión)',correct:false}],'En R, el símbolo # marca el inicio de un comentario. Todo lo que va después se ignora.');
+}},
+
+m5: { tag:'Módulo 5', title:'Variables y asignación', desc:'Aprende a guardar valores en variables para usarlos después', content: function(){
+  return '<div class="content-section"><h3>📦 ¿Qué es una variable?</h3><p>Una <strong>variable</strong> es como una caja con una etiqueta donde guardas un valor. Puedes darle un nombre y después usar ese nombre para acceder al valor.</p>' +
+  codeBlock('R','<span class="cm"># Guardar el valor 25 en una variable llamada "edad"</span>\nedad <span class="op">&lt;-</span> <span class="num">25</span>\n\n<span class="cm"># Ver el contenido de la variable</span>\nedad') +
+  output('[1] 25') + '</div>' +
+  '<div class="content-section"><h3>⬅️ El operador de asignación: <code>&lt;-</code></h3><p>En R se usa la "flecha" <code>&lt;-</code> para asignar valores a variables. Se lee como "guarda en":</p>' +
+  codeBlock('R',
+  '<span class="cm"># Se lee: "guarda 170 en la variable altura"</span>\naltura <span class="op">&lt;-</span> <span class="num">170</span>\n\n' +
+  '<span class="cm"># Se lee: "guarda 68.5 en la variable peso"</span>\npeso <span class="op">&lt;-</span> <span class="num">68.5</span>\n\n' +
+  '<span class="cm"># Puedes usar variables en cálculos</span>\nimc <span class="op">&lt;-</span> peso <span class="op">/</span> (altura<span class="op">/</span><span class="num">100</span>)<span class="op">^</span><span class="num">2</span>\nimc') +
+  output('[1] 23.70017') +
+  tip('info','⌨️','<strong>Atajo:</strong> En RStudio puedes escribir <code>&lt;-</code> pulsando <span class="kbd">Alt</span>+<span class="kbd">-</span> (Alt y el guión). Úsalo siempre, es mucho más rápido.') + '</div>' +
+  '<div class="content-section"><h3>📝 Reglas para nombres de variables</h3><ul>' +
+  '<li>Pueden contener <strong>letras, números, puntos y guiones bajos</strong></li>' +
+  '<li>Deben <strong>empezar por una letra</strong> (o un punto)</li>' +
+  '<li><strong>No pueden contener espacios</strong></li>' +
+  '<li>R distingue <strong>mayúsculas de minúsculas</strong>: <code>Edad</code> y <code>edad</code> son variables diferentes</li></ul>' +
+  codeBlock('R',
+  '<span class="cm"># ✅ Nombres válidos</span>\nmi_variable <span class="op">&lt;-</span> <span class="num">10</span>\npeso.kg <span class="op">&lt;-</span> <span class="num">70</span>\ndatos2024 <span class="op">&lt;-</span> <span class="num">42</span>\n\n' +
+  '<span class="cm"># ❌ Nombres NO válidos</span>\n<span class="cm"># 2datos &lt;- 5      # No puede empezar por número</span>\n<span class="cm"># mi variable &lt;- 3  # No puede tener espacios</span>') + '</div>' +
+  '<div class="content-section"><h3>🔄 Las variables se pueden sobreescribir</h3>' +
+  codeBlock('R','x <span class="op">&lt;-</span> <span class="num">10</span>\nx          <span class="cm"># Vale 10</span>\n\nx <span class="op">&lt;-</span> <span class="num">20</span>\nx          <span class="cm"># Ahora vale 20 (el 10 se ha perdido)</span>') +
+  output('[1] 10\n[1] 20') + '</div>' +
+  quiz('q5','¿Cuál es el operador de asignación principal en R?',[{text:'= (igual)',correct:false},{text:'== (doble igual)',correct:false},{text:'<- (flecha izquierda)',correct:true},{text:':= (dos puntos igual)',correct:false}],'En R se usa <- para asignar valores. Aunque = también funciona en muchos casos, <- es la convención estándar y la más recomendada.');
+}},
+
+m6: { tag:'Módulo 6', title:'Tipos de datos', desc:'Los diferentes tipos de información que R puede manejar', content: function(){
+  return '<div class="content-section"><h3>🏷 Tipos de datos en R</h3><p>R trabaja con diferentes tipos de datos. Los más importantes son:</p>' +
+  '<table class="compare-table"><tr><th>Tipo</th><th>Nombre en R</th><th>Ejemplo</th><th>Uso</th></tr>' +
+  '<tr><td><strong>Numérico</strong></td><td>numeric</td><td><code>3.14</code></td><td>Números con decimales</td></tr>' +
+  '<tr><td><strong>Entero</strong></td><td>integer</td><td><code>5L</code></td><td>Números sin decimales</td></tr>' +
+  '<tr><td><strong>Texto</strong></td><td>character</td><td><code>"hola"</code></td><td>Palabras, nombres</td></tr>' +
+  '<tr><td><strong>Lógico</strong></td><td>logical</td><td><code>TRUE / FALSE</code></td><td>Verdadero/falso</td></tr></table></div>' +
+  '<div class="content-section"><h3>🔢 Numéricos (numeric)</h3><p>Son números con o sin decimales. Es el tipo más común:</p>' +
+  codeBlock('R','temperatura <span class="op">&lt;-</span> <span class="num">36.5</span>\npresion <span class="op">&lt;-</span> <span class="num">120</span>\n<span class="fn">class</span>(temperatura)  <span class="cm"># Pregunta: ¿qué tipo es?</span>') +
+  output('[1] "numeric"') + '</div>' +
+  '<div class="content-section"><h3>📝 Texto (character)</h3><p>El texto siempre va entre comillas (simples o dobles):</p>' +
+  codeBlock('R','nombre <span class="op">&lt;-</span> <span class="st">"María García"</span>\ndiagnostico <span class="op">&lt;-</span> <span class="st">"Hipertensión"</span>\n<span class="fn">class</span>(nombre)') +
+  output('[1] "character"') +
+  tip('warning','⚠️','<strong>Cuidado:</strong> <code>"5"</code> (con comillas) es texto, no un número. No puedes hacer operaciones matemáticas con él.') + '</div>' +
+  '<div class="content-section"><h3>✅ Lógicos (logical)</h3><p>Solo pueden ser <code>TRUE</code> (verdadero) o <code>FALSE</code> (falso). Se usan mucho para comparaciones:</p>' +
+  codeBlock('R','<span class="num">5</span> <span class="op">&gt;</span> <span class="num">3</span>    <span class="cm"># ¿5 es mayor que 3?</span>\n<span class="num">10</span> <span class="op">==</span> <span class="num">10</span>  <span class="cm"># ¿10 es igual a 10? (doble = para comparar)</span>\n<span class="num">2</span> <span class="op">&gt;=</span> <span class="num">5</span>   <span class="cm"># ¿2 es mayor o igual que 5?</span>') +
+  output('[1] TRUE\n[1] TRUE\n[1] FALSE') + '</div>' +
+  '<div class="content-section"><h3>❓ Comprobar y convertir tipos</h3>' +
+  codeBlock('R','<span class="cm"># Comprobar el tipo</span>\n<span class="fn">class</span>(<span class="num">42</span>)\n<span class="fn">is.numeric</span>(<span class="num">42</span>)\n<span class="fn">is.character</span>(<span class="st">"hola"</span>)\n\n<span class="cm"># Convertir tipos</span>\n<span class="fn">as.numeric</span>(<span class="st">"3.14"</span>)   <span class="cm"># Texto a número</span>\n<span class="fn">as.character</span>(<span class="num">42</span>)     <span class="cm"># Número a texto</span>') + '</div>' +
+  quiz('q6','¿Qué tipo de dato es "120" (con comillas)?',[{text:'numeric (numérico)',correct:false},{text:'integer (entero)',correct:false},{text:'character (texto)',correct:true},{text:'logical (lógico)',correct:false}],'Correcto. Cualquier valor entre comillas es de tipo character (texto), aunque contenga números.');
+}},
+
+m7: { tag:'Módulo 7', title:'Vectores', desc:'Agrupa varios datos en una sola variable', content: function(){
+  return '<div class="content-section"><h3>📊 ¿Qué es un vector?</h3><p>Un <strong>vector</strong> es una colección ordenada de datos del mismo tipo. Es la estructura de datos más básica de R y se crea con la función <code>c()</code> (de "combinar"):</p>' +
+  codeBlock('R','<span class="cm"># Vector de edades de 5 pacientes</span>\nedades <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">45</span>, <span class="num">32</span>, <span class="num">67</span>, <span class="num">28</span>, <span class="num">55</span>)\nedades') +
+  output('[1] 45 32 67 28 55') + '</div>' +
+  '<div class="content-section"><h3>📏 Operaciones con vectores</h3><p>R aplica las operaciones a <strong>cada elemento</strong> del vector automáticamente:</p>' +
+  codeBlock('R','pesos_lb <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">150</span>, <span class="num">165</span>, <span class="num">180</span>, <span class="num">140</span>)\n\n<span class="cm"># Convertir libras a kilogramos (cada elemento)</span>\npesos_kg <span class="op">&lt;-</span> pesos_lb <span class="op">*</span> <span class="num">0.4536</span>\npesos_kg') +
+  output('[1] 68.04 74.84 81.65 63.50') + '</div>' +
+  '<div class="content-section"><h3>🔍 Acceder a elementos</h3><p>Usa corchetes <code>[]</code> para acceder a elementos por su posición (en R, la primera posición es 1, no 0):</p>' +
+  codeBlock('R','edades <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">45</span>, <span class="num">32</span>, <span class="num">67</span>, <span class="num">28</span>, <span class="num">55</span>)\n\nedades[<span class="num">1</span>]      <span class="cm"># Primer elemento</span>\nedades[<span class="num">3</span>]      <span class="cm"># Tercer elemento</span>\nedades[<span class="num">2</span><span class="op">:</span><span class="num">4</span>]    <span class="cm"># Elementos del 2 al 4</span>') +
+  output('[1] 45\n[1] 67\n[1] 32 67 28') + '</div>' +
+  '<div class="content-section"><h3>📈 Funciones útiles para vectores</h3>' +
+  codeBlock('R','notas <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">7.5</span>, <span class="num">8.2</span>, <span class="num">6.1</span>, <span class="num">9.0</span>, <span class="num">5.8</span>, <span class="num">7.3</span>)\n\n<span class="fn">length</span>(notas)   <span class="cm"># Cuántos elementos tiene</span>\n<span class="fn">sum</span>(notas)      <span class="cm"># Suma total</span>\n<span class="fn">mean</span>(notas)     <span class="cm"># Media aritmética</span>\n<span class="fn">max</span>(notas)      <span class="cm"># Valor máximo</span>\n<span class="fn">min</span>(notas)      <span class="cm"># Valor mínimo</span>\n<span class="fn">sort</span>(notas)     <span class="cm"># Ordenar de menor a mayor</span>') +
+  output('[1] 6\n[1] 43.9\n[1] 7.316667\n[1] 9\n[1] 5.8\n[1] 5.8 6.1 7.3 7.5 8.2 9.0') + '</div>' +
+  exercise('<p>Crea un vector con las siguientes tensiones sistólicas: 120, 135, 118, 142, 128, 155, 110</p><p>Luego calcula: la media, el máximo y cuántos pacientes hay.</p>') +
+  quiz('q7','¿Qué función se usa para crear un vector en R?',[{text:'vector()',correct:false},{text:'v()',correct:false},{text:'c()',correct:true},{text:'create()',correct:false}],'La función c() (de combine) se usa para crear vectores combinando varios valores.');
+}},
+
+m8: { tag:'Módulo 8', title:'Data frames', desc:'Tablas de datos: la estructura más importante para tus análisis', content: function(){
+  return '<div class="content-section"><h3>📋 ¿Qué es un data frame?</h3><p>Un <strong>data frame</strong> es una tabla de datos, similar a una hoja de Excel. Tiene filas (observaciones) y columnas (variables). Es LA estructura de datos más importante en R para análisis.</p>' +
+  codeBlock('R','<span class="cm"># Crear un data frame con datos de pacientes</span>\npacientes <span class="op">&lt;-</span> <span class="fn">data.frame</span>(\n  <span class="arg">nombre</span>   <span class="op">=</span> <span class="fn">c</span>(<span class="st">"Ana"</span>, <span class="st">"Luis"</span>, <span class="st">"María"</span>, <span class="st">"Pedro"</span>),\n  <span class="arg">edad</span>     <span class="op">=</span> <span class="fn">c</span>(<span class="num">45</span>, <span class="num">32</span>, <span class="num">67</span>, <span class="num">28</span>),\n  <span class="arg">peso</span>     <span class="op">=</span> <span class="fn">c</span>(<span class="num">68.5</span>, <span class="num">82.0</span>, <span class="num">55.3</span>, <span class="num">90.1</span>),\n  <span class="arg">diabetes</span> <span class="op">=</span> <span class="fn">c</span>(<span class="kw">TRUE</span>, <span class="kw">FALSE</span>, <span class="kw">TRUE</span>, <span class="kw">FALSE</span>)\n)\n\npacientes') +
+  output('  nombre edad peso diabetes\n1    Ana   45 68.5     TRUE\n2   Luis   32 82.0    FALSE\n3  María   67 55.3     TRUE\n4  Pedro   28 90.1    FALSE') + '</div>' +
+  '<div class="content-section"><h3>🔍 Explorar un data frame</h3>' +
+  codeBlock('R','<span class="fn">str</span>(pacientes)      <span class="cm"># Estructura: tipos de cada columna</span>\n<span class="fn">nrow</span>(pacientes)     <span class="cm"># Número de filas</span>\n<span class="fn">ncol</span>(pacientes)     <span class="cm"># Número de columnas</span>\n<span class="fn">head</span>(pacientes)     <span class="cm"># Primeras filas (útil con datos grandes)</span>\n<span class="fn">summary</span>(pacientes)  <span class="cm"># Resumen estadístico</span>') + '</div>' +
+  '<div class="content-section"><h3>📌 Acceder a columnas con $</h3><p>El signo <code>$</code> es fundamental. Sirve para acceder a una columna por su nombre:</p>' +
+  codeBlock('R','<span class="cm"># Acceder a la columna "edad"</span>\npacientes<span class="op">$</span>edad\n\n<span class="cm"># Calcular la media de edad</span>\n<span class="fn">mean</span>(pacientes<span class="op">$</span>edad)\n\n<span class="cm"># Acceder a la columna "nombre"</span>\npacientes<span class="op">$</span>nombre') +
+  output('[1] 45 32 67 28\n[1] 43\n[1] "Ana"   "Luis"  "María" "Pedro"') +
+  tip('success','💡','<strong>Truco:</strong> En RStudio, escribe <code>pacientes$</code> y pulsa <span class="kbd">Tab</span>. ¡Te muestra todas las columnas disponibles!') + '</div>' +
+  '<div class="content-section"><h3>📐 Filtrar filas</h3>' +
+  codeBlock('R','<span class="cm"># Pacientes mayores de 40 años</span>\npacientes[pacientes<span class="op">$</span>edad <span class="op">&gt;</span> <span class="num">40</span>, ]\n\n<span class="cm"># Pacientes con diabetes</span>\npacientes[pacientes<span class="op">$</span>diabetes <span class="op">==</span> <span class="kw">TRUE</span>, ]') +
+  output('  nombre edad peso diabetes\n1    Ana   45 68.5     TRUE\n3  María   67 55.3     TRUE') + '</div>' +
+  quiz('q8','¿Cómo se accede a la columna "peso" de un data frame llamado "datos"?',[{text:'datos[peso]',correct:false},{text:'datos.peso',correct:false},{text:'datos$peso',correct:true},{text:'peso(datos)',correct:false}],'En R se usa el operador $ para acceder a columnas de un data frame: datos$peso');
+}},
+
+m9: { tag:'Módulo 9', title:'Paquetes (packages)', desc:'Amplía las capacidades de R instalando paquetes', content: function(){
+  return '<div class="content-section"><h3>📦 ¿Qué son los paquetes?</h3><p>Los paquetes son <strong>extensiones</strong> que añaden funciones nuevas a R. Piensa en ellos como "apps" que instalas para obtener funcionalidades extra.</p><p>R viene con funciones básicas, pero la comunidad ha creado miles de paquetes para tareas específicas.</p></div>' +
+  '<div class="content-section"><h3>⬇️ Instalar vs. Cargar</h3><p>Hay dos pasos que son muy importantes distinguir:</p>' +
+  '<table class="compare-table"><tr><th>Acción</th><th>Comando</th><th>¿Cuándo?</th><th>Analogía</th></tr>' +
+  '<tr><td><strong>Instalar</strong></td><td><code>install.packages()</code></td><td>Solo UNA vez</td><td>Descargar una app</td></tr>' +
+  '<tr><td><strong>Cargar</strong></td><td><code>library()</code></td><td>Cada vez que abres R</td><td>Abrir la app</td></tr></table>' +
+  codeBlock('R','<span class="cm"># INSTALAR un paquete (solo la primera vez)</span>\n<span class="fn">install.packages</span>(<span class="st">"ggplot2"</span>)\n\n<span class="cm"># CARGAR un paquete (cada vez que abres R)</span>\n<span class="kw">library</span>(ggplot2)') +
+  tip('warning','⚠️','<strong>Atención:</strong> Para instalar se usan comillas (<code>"ggplot2"</code>), pero para cargar NO (<code>library(ggplot2)</code>).') + '</div>' +
+  '<div class="content-section"><h3>🌟 Paquetes esenciales para ciencias de la salud</h3>' +
+  '<table class="compare-table"><tr><th>Paquete</th><th>Para qué sirve</th></tr>' +
+  '<tr><td><strong>tidyverse</strong></td><td>Colección de paquetes para manipulación y visualización de datos</td></tr>' +
+  '<tr><td><strong>readxl</strong></td><td>Importar archivos Excel (.xlsx)</td></tr>' +
+  '<tr><td><strong>ggplot2</strong></td><td>Crear gráficos de alta calidad</td></tr>' +
+  '<tr><td><strong>dplyr</strong></td><td>Manipular y transformar datos</td></tr>' +
+  '<tr><td><strong>gtsummary</strong></td><td>Tablas descriptivas de estilo publicación</td></tr></table>' +
+  codeBlock('R','<span class="cm"># Instalar el "paquete de paquetes" más popular</span>\n<span class="fn">install.packages</span>(<span class="st">"tidyverse"</span>)\n\n<span class="cm"># Esto instala ggplot2, dplyr, readr, tidyr,</span>\n<span class="cm"># purrr, tibble, stringr y forcats de una vez</span>') + '</div>' +
+  quiz('q9','¿Cuál es la diferencia entre install.packages() y library()?',[{text:'No hay diferencia, hacen lo mismo',correct:false},{text:'install.packages() descarga el paquete (1 vez) y library() lo activa para usarlo (cada sesión)',correct:true},{text:'install.packages() es para R y library() para RStudio',correct:false},{text:'library() instala y carga a la vez',correct:false}],'install.packages() descarga e instala (solo una vez). library() carga el paquete en memoria para poder usarlo (cada vez que abres R).');
+}},
+
+m10: { tag:'Módulo 10', title:'Importar datos', desc:'Lee archivos Excel, CSV y otros formatos en R', content: function(){
+  return '<div class="content-section"><h3>📂 Importar archivos CSV</h3><p>CSV (Comma-Separated Values) es el formato más universal. R lo lee directamente:</p>' +
+  codeBlock('R','<span class="cm"># Leer un archivo CSV</span>\ndatos <span class="op">&lt;-</span> <span class="fn">read.csv</span>(<span class="st">"mi_archivo.csv"</span>)\n\n<span class="cm"># Si el separador es punto y coma (;) — común en España</span>\ndatos <span class="op">&lt;-</span> <span class="fn">read.csv2</span>(<span class="st">"mi_archivo.csv"</span>)\n\n<span class="cm"># Ver las primeras filas</span>\n<span class="fn">head</span>(datos)') +
+  tip('info','🇪🇸','<strong>En España:</strong> Los CSV exportados desde Excel en español suelen usar <code>;</code> como separador y <code>,</code> para decimales. Usa <code>read.csv2()</code> para estos archivos.') + '</div>' +
+  '<div class="content-section"><h3>📊 Importar archivos Excel</h3>' +
+  codeBlock('R','<span class="cm"># Primero instala y carga el paquete readxl</span>\n<span class="fn">install.packages</span>(<span class="st">"readxl"</span>)  <span class="cm"># Solo la primera vez</span>\n<span class="kw">library</span>(readxl)\n\n<span class="cm"># Leer un archivo Excel</span>\ndatos <span class="op">&lt;-</span> <span class="fn">read_excel</span>(<span class="st">"datos_pacientes.xlsx"</span>)\n\n<span class="cm"># Leer una hoja específica</span>\ndatos <span class="op">&lt;-</span> <span class="fn">read_excel</span>(<span class="st">"datos.xlsx"</span>, <span class="arg">sheet</span> <span class="op">=</span> <span class="st">"Hoja2"</span>)') + '</div>' +
+  '<div class="content-section"><h3>📍 El directorio de trabajo</h3><p>R necesita saber <strong>dónde están tus archivos</strong>. Esto se llama directorio de trabajo:</p>' +
+  codeBlock('R','<span class="cm"># Ver cuál es tu directorio de trabajo actual</span>\n<span class="fn">getwd</span>()\n\n<span class="cm"># Cambiar el directorio de trabajo</span>\n<span class="fn">setwd</span>(<span class="st">"/ruta/a/mi/carpeta"</span>)') +
+  tip('success','💡','<strong>Mejor opción:</strong> Usa <strong>Proyectos de RStudio</strong> (lo veremos en el módulo 13) en vez de setwd(). Los proyectos gestionan el directorio automáticamente.') + '</div>' +
+  '<div class="content-section"><h3>🖱 Importar con el menú de RStudio</h3><p>RStudio tiene un asistente visual para importar datos:</p><ol>' +
+  '<li>Ve a <strong>File → Import Dataset</strong></li><li>Elige el formato: "From Text (base)", "From Excel", etc.</li><li>Selecciona tu archivo</li><li>Ajusta las opciones (separador, decimales...)</li><li>Haz clic en <strong>Import</strong></li></ol>' +
+  tip('info','💡','El asistente te muestra el código R equivalente. Cópialo en tu script para poder reproducir la importación más adelante.') + '</div>' +
+  quiz('q10','¿Qué función usarías para importar un CSV generado en Excel en España (separador ;)?',[{text:'read.csv()',correct:false},{text:'read.csv2()',correct:true},{text:'read_excel()',correct:false},{text:'import.csv()',correct:false}],'read.csv2() lee archivos CSV con separador punto y coma (;) y coma (,) como decimal, que es el formato habitual en España.');
+}},
+
+m11: { tag:'Módulo 11', title:'Estadística descriptiva', desc:'Calcula medias, medianas, frecuencias y más', content: function(){
+  return '<div class="content-section"><h3>📊 Resumen rápido con summary()</h3><p>La función más útil para empezar a explorar tus datos:</p>' +
+  codeBlock('R','<span class="cm"># Crear datos de ejemplo</span>\npresion <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">120</span>, <span class="num">135</span>, <span class="num">118</span>, <span class="num">142</span>, <span class="num">128</span>, <span class="num">155</span>, <span class="num">110</span>, <span class="num">138</span>)\n\n<span class="cm"># Resumen estadístico completo</span>\n<span class="fn">summary</span>(presion)') +
+  output('   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.\n  110.0   121.0   131.5   130.8   139.0   155.0') + '</div>' +
+  '<div class="content-section"><h3>📐 Medidas de tendencia central</h3>' +
+  codeBlock('R','valores <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">120</span>, <span class="num">135</span>, <span class="num">118</span>, <span class="num">142</span>, <span class="num">128</span>, <span class="num">155</span>, <span class="num">110</span>, <span class="num">138</span>)\n\n<span class="fn">mean</span>(valores)        <span class="cm"># Media aritmética</span>\n<span class="fn">median</span>(valores)      <span class="cm"># Mediana</span>') +
+  output('[1] 130.75\n[1] 131.5') + '</div>' +
+  '<div class="content-section"><h3>📏 Medidas de dispersión</h3>' +
+  codeBlock('R','<span class="fn">sd</span>(valores)       <span class="cm"># Desviación estándar</span>\n<span class="fn">var</span>(valores)      <span class="cm"># Varianza</span>\n<span class="fn">range</span>(valores)    <span class="cm"># Rango (mínimo y máximo)</span>\n<span class="fn">IQR</span>(valores)      <span class="cm"># Rango intercuartílico</span>') +
+  output('[1] 14.38\n[1] 206.79\n[1] 110 155\n[1] 18') + '</div>' +
+  '<div class="content-section"><h3>📋 Tablas de frecuencia</h3>' +
+  codeBlock('R','<span class="cm"># Para variables categóricas</span>\ngrupo <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"A"</span>, <span class="st">"C"</span>, <span class="st">"B"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>)\n\n<span class="fn">table</span>(grupo)             <span class="cm"># Frecuencias absolutas</span>\n<span class="fn">prop.table</span>(<span class="fn">table</span>(grupo)) <span class="cm"># Frecuencias relativas</span>') +
+  output('grupo\nA B C\n3 3 2\n\ngrupo\n    A     B     C\n0.375 0.375 0.250') + '</div>' +
+  '<div class="content-section"><h3>⚠️ Datos faltantes (NA)</h3><p>En datos reales es habitual tener valores ausentes, representados como <code>NA</code>:</p>' +
+  codeBlock('R','datos <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">120</span>, <span class="num">135</span>, <span class="kw">NA</span>, <span class="num">142</span>, <span class="num">128</span>)\n\n<span class="fn">mean</span>(datos)                   <span class="cm"># Devuelve NA</span>\n<span class="fn">mean</span>(datos, <span class="arg">na.rm</span> <span class="op">=</span> <span class="kw">TRUE</span>)    <span class="cm"># Ignora los NA</span>') +
+  output('[1] NA\n[1] 131.25') +
+  tip('warning','⚠️','<strong>Recuerda:</strong> Si tus datos tienen valores faltantes, añade <code>na.rm = TRUE</code> a las funciones estadísticas. Si no, el resultado será <code>NA</code>.') + '</div>' +
+  quiz('q11','Si mean() te devuelve NA, ¿qué debes hacer?',[{text:'Hay un error en la instalación de R',correct:false},{text:'Usar la función media() en vez de mean()',correct:false},{text:'Añadir na.rm = TRUE para ignorar los valores faltantes',correct:true},{text:'Borrar el vector y crear uno nuevo',correct:false}],'Cuando hay valores NA en los datos, las funciones estadísticas devuelven NA. Con na.rm = TRUE le dices a R que ignore los valores ausentes.');
+}},
+
+m12: { tag:'Módulo 12', title:'Gráficos básicos', desc:'Crea tus primeras visualizaciones de datos', content: function(){
+  return '<div class="content-section"><h3>📊 Gráficos con R base</h3><p>R incluye funciones básicas para crear gráficos rápidamente:</p>' +
+  codeBlock('R','<span class="cm"># Histograma — distribución de una variable</span>\nedades <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">25</span>,<span class="num">32</span>,<span class="num">45</span>,<span class="num">28</span>,<span class="num">67</span>,<span class="num">55</span>,<span class="num">43</span>,<span class="num">38</span>,<span class="num">51</span>,<span class="num">62</span>,<span class="num">33</span>,<span class="num">47</span>)\n<span class="fn">hist</span>(edades,\n     <span class="arg">main</span> <span class="op">=</span> <span class="st">"Distribución de edades"</span>,\n     <span class="arg">xlab</span> <span class="op">=</span> <span class="st">"Edad (años)"</span>,\n     <span class="arg">ylab</span> <span class="op">=</span> <span class="st">"Frecuencia"</span>,\n     <span class="arg">col</span>  <span class="op">=</span> <span class="st">"lightblue"</span>)') + '</div>' +
+  '<div class="content-section"><h3>📈 Otros gráficos básicos</h3>' +
+  codeBlock('R','<span class="cm"># Diagrama de barras</span>\ngrupos <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="st">"Control"</span>,<span class="st">"Tratamiento"</span>,<span class="st">"Control"</span>,<span class="st">"Tratamiento"</span>,\n           <span class="st">"Control"</span>,<span class="st">"Tratamiento"</span>,<span class="st">"Control"</span>)\n<span class="fn">barplot</span>(<span class="fn">table</span>(grupos),\n        <span class="arg">main</span> <span class="op">=</span> <span class="st">"Pacientes por grupo"</span>,\n        <span class="arg">col</span>  <span class="op">=</span> <span class="fn">c</span>(<span class="st">"salmon"</span>, <span class="st">"steelblue"</span>))\n\n<span class="cm"># Diagrama de caja (boxplot)</span>\n<span class="fn">boxplot</span>(edades,\n        <span class="arg">main</span> <span class="op">=</span> <span class="st">"Boxplot de edades"</span>,\n        <span class="arg">ylab</span> <span class="op">=</span> <span class="st">"Edad"</span>,\n        <span class="arg">col</span>  <span class="op">=</span> <span class="st">"lightgreen"</span>)\n\n<span class="cm"># Diagrama de dispersión</span>\npeso <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">60</span>,<span class="num">72</span>,<span class="num">85</span>,<span class="num">65</span>,<span class="num">90</span>,<span class="num">78</span>,<span class="num">82</span>,<span class="num">70</span>,<span class="num">88</span>,<span class="num">76</span>,<span class="num">68</span>,<span class="num">80</span>)\n<span class="fn">plot</span>(edades, peso,\n     <span class="arg">main</span> <span class="op">=</span> <span class="st">"Edad vs Peso"</span>,\n     <span class="arg">xlab</span> <span class="op">=</span> <span class="st">"Edad"</span>,\n     <span class="arg">ylab</span> <span class="op">=</span> <span class="st">"Peso (kg)"</span>,\n     <span class="arg">pch</span>  <span class="op">=</span> <span class="num">19</span>,\n     <span class="arg">col</span>  <span class="op">=</span> <span class="st">"darkblue"</span>)') + '</div>' +
+  '<div class="content-section"><h3>🎨 Introducción a ggplot2</h3><p><code>ggplot2</code> es el paquete de gráficos más popular de R. Produce gráficos mucho más elegantes:</p>' +
+  codeBlock('R','<span class="kw">library</span>(ggplot2)\n\n<span class="cm"># Crear un data frame</span>\ndf <span class="op">&lt;-</span> <span class="fn">data.frame</span>(<span class="arg">edad</span> <span class="op">=</span> edades, <span class="arg">peso</span> <span class="op">=</span> peso)\n\n<span class="cm"># Gráfico de dispersión con ggplot2</span>\n<span class="fn">ggplot</span>(df, <span class="fn">aes</span>(<span class="arg">x</span> <span class="op">=</span> edad, <span class="arg">y</span> <span class="op">=</span> peso)) <span class="op">+</span>\n  <span class="fn">geom_point</span>(<span class="arg">color</span> <span class="op">=</span> <span class="st">"steelblue"</span>, <span class="arg">size</span> <span class="op">=</span> <span class="num">3</span>) <span class="op">+</span>\n  <span class="fn">labs</span>(<span class="arg">title</span> <span class="op">=</span> <span class="st">"Relación Edad-Peso"</span>,\n       <span class="arg">x</span> <span class="op">=</span> <span class="st">"Edad (años)"</span>,\n       <span class="arg">y</span> <span class="op">=</span> <span class="st">"Peso (kg)"</span>) <span class="op">+</span>\n  <span class="fn">theme_minimal</span>()') +
+  tip('info','💡','La lógica de ggplot2 es "sumar capas": primero defines los datos y ejes (<code>ggplot + aes</code>), luego añades geometrías (<code>geom_point</code>, <code>geom_bar</code>...) y personalizaciones con <code>+</code>.') + '</div>' +
+  exercise('<p>Crea un vector con 10 valores de glucosa y haz un histograma con <code>hist()</code>. Ponle título y color.</p>') +
+  quiz('q12','¿Qué función de R base crea un histograma?',[{text:'histogram()',correct:false},{text:'hist()',correct:true},{text:'plot.hist()',correct:false},{text:'barplot()',correct:false}],'hist() es la función de R base para crear histogramas. barplot() es para diagramas de barras, que es diferente.');
+}},
+
+m13: { tag:'Módulo 13', title:'Scripts y proyectos', desc:'Organiza tu trabajo de forma profesional', content: function(){
+  return '<div class="content-section"><h3>📄 ¿Qué es un script?</h3><p>Un <strong>script</strong> es un archivo de texto (.R) donde guardas tu código. A diferencia de escribir en la consola, el código en un script se puede guardar, modificar y volver a ejecutar.</p>' +
+  codeBlock('R','<span class="cm"># Mi primer script: analisis_pacientes.R</span>\n<span class="cm"># Autor: [Tu nombre]</span>\n<span class="cm"># Fecha: 2026-03-23</span>\n<span class="cm"># Objetivo: Análisis descriptivo de datos de pacientes</span>\n\n<span class="cm"># 1. Cargar paquetes</span>\n<span class="kw">library</span>(readxl)\n\n<span class="cm"># 2. Importar datos</span>\ndatos <span class="op">&lt;-</span> <span class="fn">read_excel</span>(<span class="st">"pacientes.xlsx"</span>)\n\n<span class="cm"># 3. Explorar</span>\n<span class="fn">str</span>(datos)\n<span class="fn">summary</span>(datos)\n\n<span class="cm"># 4. Análisis</span>\n<span class="fn">mean</span>(datos<span class="op">$</span>edad, <span class="arg">na.rm</span> <span class="op">=</span> <span class="kw">TRUE</span>)') + '</div>' +
+  '<div class="content-section"><h3>▶️ Ejecutar código desde el Editor</h3><p>Para enviar código del Editor a la Consola:</p>' +
+  '<table class="shortcuts-table"><tr><th>Acción</th><th>Atajo</th></tr>' +
+  '<tr><td>Ejecutar la línea actual</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Enter</span></td></tr>' +
+  '<tr><td>Ejecutar todo el script</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">Enter</span></td></tr>' +
+  '<tr><td>Ejecutar la selección</td><td>Selecciona texto + <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span></td></tr></table>' +
+  tip('success','💡','<strong>Flujo habitual:</strong> Escribes código en el Editor → pulsas <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span> → el resultado aparece en la Consola. Así vas probando línea a línea.') + '</div>' +
+  '<div class="content-section"><h3>📁 Proyectos de RStudio</h3><p>Un <strong>Proyecto de RStudio</strong> (.Rproj) organiza todo tu trabajo en una carpeta:</p><ul>' +
+  '<li>Establece el directorio de trabajo automáticamente</li><li>Mantiene el historial de código</li><li>Permite cambiar entre proyectos fácilmente</li></ul>' +
+  '<p><strong>Crear un proyecto:</strong> File → New Project → New Directory → New Project → Pon un nombre y elige ubicación → Create Project</p>' +
+  tip('warning','⚠️','<strong>Regla de oro:</strong> Crea SIEMPRE un proyecto para cada análisis o trabajo. Es la mejor forma de mantener tu trabajo organizado y reproducible.') + '</div>' +
+  '<div class="content-section"><h3>📂 Estructura recomendada</h3>' + output('mi_proyecto/\n├── mi_proyecto.Rproj     ← Archivo de proyecto\n├── datos/                ← Datos originales\n│   └── pacientes.xlsx\n├── scripts/              ← Tus scripts de R\n│   ├── 01_importar.R\n│   └── 02_analisis.R\n├── resultados/           ← Gráficos, tablas exportadas\n│   └── grafico1.png\n└── README.md             ← Descripción del proyecto') + '</div>' +
+  quiz('q13','¿Cuál es el atajo para ejecutar una línea de código del Editor en la Consola?',[{text:'Ctrl + R',correct:false},{text:'Ctrl + Enter',correct:true},{text:'F5',correct:false},{text:'Ctrl + Shift + S',correct:false}],'Ctrl + Enter (o Cmd + Enter en Mac) ejecuta la línea actual del Editor en la Consola. Es el atajo que más usarás.');
+}},
+
+m14: { tag:'Módulo 14', title:'Atajos y productividad', desc:'Trabaja más rápido con estos atajos y trucos', content: function(){
+  return '<div class="content-section"><h3>⌨️ Atajos imprescindibles de RStudio</h3><p>Estos atajos te harán mucho más productivo/a:</p>' +
+  '<table class="shortcuts-table"><tr><th>Acción</th><th>Windows/Linux</th><th>Mac</th></tr>' +
+  '<tr><td>Operador de asignación <code>&lt;-</code></td><td><span class="kbd">Alt</span>+<span class="kbd">-</span></td><td><span class="kbd">Option</span>+<span class="kbd">-</span></td></tr>' +
+  '<tr><td>Ejecutar línea/selección</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Enter</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">Enter</span></td></tr>' +
+  '<tr><td>Ejecutar todo el script</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">Enter</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">Shift</span>+<span class="kbd">Enter</span></td></tr>' +
+  '<tr><td>Nuevo script</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">N</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">Shift</span>+<span class="kbd">N</span></td></tr>' +
+  '<tr><td>Guardar script</td><td><span class="kbd">Ctrl</span>+<span class="kbd">S</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">S</span></td></tr>' +
+  '<tr><td>Comentar/descomentar línea</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">C</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">Shift</span>+<span class="kbd">C</span></td></tr>' +
+  '<tr><td>Autocompletar</td><td><span class="kbd">Tab</span></td><td><span class="kbd">Tab</span></td></tr>' +
+  '<tr><td>Buscar ayuda de una función</td><td><span class="kbd">F1</span> (con cursor en la función)</td><td><span class="kbd">F1</span></td></tr>' +
+  '<tr><td>Insertar pipe <code>|&gt;</code></td><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">M</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">Shift</span>+<span class="kbd">M</span></td></tr>' +
+  '<tr><td>Limpiar consola</td><td><span class="kbd">Ctrl</span>+<span class="kbd">L</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">L</span></td></tr></table></div>' +
+  '<div class="content-section"><h3>🔧 Trucos de productividad</h3>' +
+  '<p><strong>1. Autocompletado con Tab:</strong> Empieza a escribir y pulsa <span class="kbd">Tab</span>. RStudio te sugiere nombres de funciones, variables, archivos y argumentos.</p>' +
+  '<p><strong>2. Historial de comandos:</strong> En la consola, usa las flechas <span class="kbd">↑</span> y <span class="kbd">↓</span> para navegar por comandos anteriores.</p>' +
+  '<p><strong>3. Ejecutar solo una parte:</strong> Selecciona las líneas que quieres ejecutar y pulsa <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span>.</p>' +
+  '<p><strong>4. Secciones de código:</strong></p>' +
+  codeBlock('R','<span class="cm"># 1. Importar datos ----</span>\n<span class="cm"># (el cuádruple guión crea una sección colapsable)</span>\n\n<span class="cm"># 2. Limpiar datos ----</span>\n\n<span class="cm"># 3. Análisis ----</span>') + '</div>' +
+  exercise('<ol><li>Crea un nuevo script (<span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">N</span>)</li><li>Escribe <code>x </code> y usa <span class="kbd">Alt</span>+<span class="kbd">-</span> para generar <code>&lt;-</code></li><li>Completa: <code>x &lt;- 42</code> y ejecuta con <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span></li><li>Guarda el script con <span class="kbd">Ctrl</span>+<span class="kbd">S</span></li></ol>');
+}},
+
+m15: { tag:'Módulo 15', title:'Dónde buscar ayuda', desc:'Recursos y estrategias para cuando te quedes atascado/a', content: function(){
+  return '<div class="content-section"><h3>❓ Ayuda dentro de R</h3>' +
+  codeBlock('R','<span class="cm"># Ver la ayuda de una función</span>\n<span class="op">?</span><span class="fn">mean</span>\n<span class="fn">help</span>(mean)\n\n<span class="cm"># Buscar funciones por palabra clave</span>\n<span class="op">??</span><span class="st">"linear model"</span>\n\n<span class="cm"># Ver los argumentos de una función</span>\n<span class="fn">args</span>(round)\n\n<span class="cm"># Ver un ejemplo de uso</span>\n<span class="fn">example</span>(hist)') + '</div>' +
+  '<div class="content-section"><h3>🌐 Recursos online</h3>' +
+  '<table class="compare-table"><tr><th>Recurso</th><th>Descripción</th></tr>' +
+  '<tr><td><strong>Stack Overflow</strong></td><td>Busca tu error: casi seguro que alguien ya lo ha resuelto</td></tr>' +
+  '<tr><td><strong>R for Data Science (r4ds.hadley.nz)</strong></td><td>Libro online gratuito, excelente para aprender tidyverse</td></tr>' +
+  '<tr><td><strong>Cheat sheets de RStudio</strong></td><td>Hojas resumen con las funciones principales de cada paquete</td></tr>' +
+  '<tr><td><strong>ChatGPT / Claude</strong></td><td>La IA generativa puede explicar errores y sugerir código</td></tr></table></div>' +
+  '<div class="content-section"><h3>🐛 Cómo interpretar errores</h3><p>Los errores en R pueden parecer crípticos al principio. Algunos consejos:</p>' +
+  '<p><strong>Error común 1: Objeto no encontrado</strong></p>' +
+  '<div class="output-block" style="border-left-color:var(--rojo)">Error in eval(expr, envir, enclos) : object \'datos\' not found</div>' +
+  '<p>→ La variable <code>datos</code> no existe. ¿La has creado? ¿Has escrito bien el nombre?</p>' +
+  '<p><strong>Error común 2: Función no encontrada</strong></p>' +
+  '<div class="output-block" style="border-left-color:var(--rojo)">Error in read_excel("datos.xlsx") : could not find function "read_excel"</div>' +
+  '<p>→ No has cargado el paquete. Ejecuta <code>library(readxl)</code> primero.</p>' +
+  '<p><strong>Error común 3: Argumento inesperado</strong></p>' +
+  '<div class="output-block" style="border-left-color:var(--rojo)">Error in mean(x, narm = TRUE) : unused argument (narm = TRUE)</div>' +
+  '<p>→ El argumento se llama <code>na.rm</code>, no <code>narm</code>. Revisa la ortografía.</p>' +
+  tip('success','💡','<strong>Truco:</strong> Copia el texto del error y pégalo en Google o en una IA. Es la forma más rápida de encontrar la solución.') + '</div>' +
+  '<div class="content-section"><h3>🎉 ¡Enhorabuena!</h3><p>Has completado los 15 módulos del Tutor de R & RStudio. Ahora tienes los fundamentos para:</p><ul>' +
+  '<li>Trabajar con la interfaz de RStudio</li><li>Escribir código R básico</li><li>Manejar datos en vectores y data frames</li>' +
+  '<li>Importar datos desde Excel y CSV</li><li>Calcular estadísticas descriptivas</li><li>Crear gráficos</li>' +
+  '<li>Organizar tu trabajo con scripts y proyectos</li></ul></div>';
+}},
+
+ref: { tag:'Referencia', title:'Guía rápida de comandos R', desc:'Todos los comandos importantes en un solo lugar — consúltalo siempre que lo necesites', content: function(){
+  return tip('info','📌','Esta sección es tu <strong>chuleta de referencia</strong>. No necesitas memorizar todo: vuelve aquí siempre que necesites recordar un comando. Puedes copiar los ejemplos directamente a RStudio.') +
+
+  '<div class="content-section"><h3>🧮 Operaciones básicas</h3>' +
+  '<table class="shortcuts-table"><tr><th>Operación</th><th>Comando</th><th>Ejemplo</th></tr>' +
+  '<tr><td>Suma</td><td><code>+</code></td><td><code>5 + 3</code></td></tr>' +
+  '<tr><td>Resta</td><td><code>-</code></td><td><code>10 - 4</code></td></tr>' +
+  '<tr><td>Multiplicación</td><td><code>*</code></td><td><code>6 * 7</code></td></tr>' +
+  '<tr><td>División</td><td><code>/</code></td><td><code>20 / 4</code></td></tr>' +
+  '<tr><td>Potencia</td><td><code>^</code></td><td><code>2^3</code></td></tr>' +
+  '<tr><td>Resto (módulo)</td><td><code>%%</code></td><td><code>10 %% 3</code> → 1</td></tr>' +
+  '<tr><td>División entera</td><td><code>%/%</code></td><td><code>10 %/% 3</code> → 3</td></tr></table></div>' +
+
+  '<div class="content-section"><h3>📐 Funciones matemáticas</h3>' +
+  '<table class="shortcuts-table"><tr><th>Función</th><th>Descripción</th><th>Ejemplo</th></tr>' +
+  '<tr><td><code>sqrt(x)</code></td><td>Raíz cuadrada</td><td><code>sqrt(16)</code> → 4</td></tr>' +
+  '<tr><td><code>abs(x)</code></td><td>Valor absoluto</td><td><code>abs(-5)</code> → 5</td></tr>' +
+  '<tr><td><code>round(x, n)</code></td><td>Redondear a n decimales</td><td><code>round(3.146, 2)</code> → 3.15</td></tr>' +
+  '<tr><td><code>ceiling(x)</code></td><td>Redondear hacia arriba</td><td><code>ceiling(3.2)</code> → 4</td></tr>' +
+  '<tr><td><code>floor(x)</code></td><td>Redondear hacia abajo</td><td><code>floor(3.8)</code> → 3</td></tr>' +
+  '<tr><td><code>log(x)</code></td><td>Logaritmo natural</td><td><code>log(2.718)</code> → ~1</td></tr>' +
+  '<tr><td><code>log10(x)</code></td><td>Logaritmo base 10</td><td><code>log10(100)</code> → 2</td></tr>' +
+  '<tr><td><code>exp(x)</code></td><td>Exponencial (e^x)</td><td><code>exp(1)</code> → 2.718</td></tr></table></div>' +
+
+  '<div class="content-section"><h3>📦 Variables y asignación</h3>' +
+  '<table class="shortcuts-table"><tr><th>Acción</th><th>Comando</th><th>Ejemplo</th></tr>' +
+  '<tr><td>Asignar valor</td><td><code>&lt;-</code></td><td><code>x &lt;- 10</code></td></tr>' +
+  '<tr><td>Ver valor</td><td>Escribir el nombre</td><td><code>x</code></td></tr>' +
+  '<tr><td>Listar variables creadas</td><td><code>ls()</code></td><td><code>ls()</code></td></tr>' +
+  '<tr><td>Eliminar variable</td><td><code>rm(x)</code></td><td><code>rm(x)</code></td></tr>' +
+  '<tr><td>Eliminar todas las variables</td><td><code>rm(list = ls())</code></td><td><code>rm(list = ls())</code></td></tr></table></div>' +
+
+  '<div class="content-section"><h3>🔍 Tipos de datos</h3>' +
+  '<table class="shortcuts-table"><tr><th>Acción</th><th>Comando</th><th>Ejemplo</th></tr>' +
+  '<tr><td>Ver el tipo/clase</td><td><code>class(x)</code></td><td><code>class(3.14)</code> → "numeric"</td></tr>' +
+  '<tr><td>¿Es numérico?</td><td><code>is.numeric(x)</code></td><td><code>is.numeric(5)</code> → TRUE</td></tr>' +
+  '<tr><td>¿Es texto?</td><td><code>is.character(x)</code></td><td><code>is.character("a")</code> → TRUE</td></tr>' +
+  '<tr><td>Convertir a número</td><td><code>as.numeric(x)</code></td><td><code>as.numeric("3.14")</code></td></tr>' +
+  '<tr><td>Convertir a texto</td><td><code>as.character(x)</code></td><td><code>as.character(42)</code></td></tr>' +
+  '<tr><td>¿Es valor faltante?</td><td><code>is.na(x)</code></td><td><code>is.na(NA)</code> → TRUE</td></tr></table></div>' +
+
+  '<div class="content-section"><h3>📊 Comparaciones y lógica</h3>' +
+  '<table class="shortcuts-table"><tr><th>Operador</th><th>Significado</th><th>Ejemplo</th></tr>' +
+  '<tr><td><code>==</code></td><td>Igual a</td><td><code>5 == 5</code> → TRUE</td></tr>' +
+  '<tr><td><code>!=</code></td><td>Distinto de</td><td><code>5 != 3</code> → TRUE</td></tr>' +
+  '<tr><td><code>&gt;</code></td><td>Mayor que</td><td><code>5 &gt; 3</code> → TRUE</td></tr>' +
+  '<tr><td><code>&lt;</code></td><td>Menor que</td><td><code>3 &lt; 5</code> → TRUE</td></tr>' +
+  '<tr><td><code>&gt;=</code></td><td>Mayor o igual</td><td><code>5 &gt;= 5</code> → TRUE</td></tr>' +
+  '<tr><td><code>&lt;=</code></td><td>Menor o igual</td><td><code>3 &lt;= 5</code> → TRUE</td></tr>' +
+  '<tr><td><code>&amp;</code></td><td>Y (ambas ciertas)</td><td><code>TRUE &amp; FALSE</code> → FALSE</td></tr>' +
+  '<tr><td><code>|</code></td><td>O (al menos una cierta)</td><td><code>TRUE | FALSE</code> → TRUE</td></tr>' +
+  '<tr><td><code>!</code></td><td>Negación (NOT)</td><td><code>!TRUE</code> → FALSE</td></tr></table></div>' +
+
+  '<div class="content-section"><h3>📋 Vectores</h3>' +
+  '<table class="shortcuts-table"><tr><th>Acción</th><th>Comando</th><th>Ejemplo</th></tr>' +
+  '<tr><td>Crear vector</td><td><code>c()</code></td><td><code>c(1, 2, 3, 4)</code></td></tr>' +
+  '<tr><td>Secuencia</td><td><code>seq()</code></td><td><code>seq(1, 10, by = 2)</code> → 1 3 5 7 9</td></tr>' +
+  '<tr><td>Secuencia simple</td><td><code>:</code></td><td><code>1:5</code> → 1 2 3 4 5</td></tr>' +
+  '<tr><td>Repetir</td><td><code>rep()</code></td><td><code>rep("A", 3)</code> → "A" "A" "A"</td></tr>' +
+  '<tr><td>Longitud</td><td><code>length(x)</code></td><td><code>length(c(1,2,3))</code> → 3</td></tr>' +
+  '<tr><td>Acceder al elemento i</td><td><code>x[i]</code></td><td><code>x[1]</code> (primer elemento)</td></tr>' +
+  '<tr><td>Rango de elementos</td><td><code>x[i:j]</code></td><td><code>x[2:4]</code> (del 2 al 4)</td></tr>' +
+  '<tr><td>Excluir elemento</td><td><code>x[-i]</code></td><td><code>x[-1]</code> (todos menos el 1°)</td></tr>' +
+  '<tr><td>Ordenar</td><td><code>sort(x)</code></td><td><code>sort(c(3,1,2))</code> → 1 2 3</td></tr>' +
+  '<tr><td>Invertir orden</td><td><code>rev(x)</code></td><td><code>rev(c(1,2,3))</code> → 3 2 1</td></tr>' +
+  '<tr><td>Valores únicos</td><td><code>unique(x)</code></td><td><code>unique(c(1,1,2))</code> → 1 2</td></tr>' +
+  '<tr><td>¿Está contenido?</td><td><code>%in%</code></td><td><code>3 %in% c(1,2,3)</code> → TRUE</td></tr></table></div>' +
+
+  '<div class="content-section"><h3>📈 Estadística descriptiva</h3>' +
+  '<table class="shortcuts-table"><tr><th>Función</th><th>Descripción</th><th>Nota</th></tr>' +
+  '<tr><td><code>mean(x)</code></td><td>Media aritmética</td><td>Añade <code>na.rm=TRUE</code> si hay NA</td></tr>' +
+  '<tr><td><code>median(x)</code></td><td>Mediana</td><td></td></tr>' +
+  '<tr><td><code>sd(x)</code></td><td>Desviación estándar</td><td></td></tr>' +
+  '<tr><td><code>var(x)</code></td><td>Varianza</td><td></td></tr>' +
+  '<tr><td><code>min(x)</code> / <code>max(x)</code></td><td>Mínimo / Máximo</td><td></td></tr>' +
+  '<tr><td><code>range(x)</code></td><td>Mínimo y máximo</td><td>Devuelve 2 valores</td></tr>' +
+  '<tr><td><code>sum(x)</code></td><td>Suma total</td><td></td></tr>' +
+  '<tr><td><code>IQR(x)</code></td><td>Rango intercuartílico</td><td></td></tr>' +
+  '<tr><td><code>quantile(x)</code></td><td>Cuartiles</td><td><code>quantile(x, 0.25)</code> para el Q1</td></tr>' +
+  '<tr><td><code>summary(x)</code></td><td>Resumen completo</td><td>Min, Q1, Mediana, Media, Q3, Max</td></tr>' +
+  '<tr><td><code>table(x)</code></td><td>Frecuencias absolutas</td><td>Para variables categóricas</td></tr>' +
+  '<tr><td><code>prop.table(table(x))</code></td><td>Frecuencias relativas</td><td>Proporciones (0 a 1)</td></tr>' +
+  '<tr><td><code>cor(x, y)</code></td><td>Correlación</td><td>Pearson por defecto</td></tr></table></div>' +
+
+  '<div class="content-section"><h3>🗃 Data frames</h3>' +
+  '<table class="shortcuts-table"><tr><th>Acción</th><th>Comando</th><th>Ejemplo / Nota</th></tr>' +
+  '<tr><td>Crear data frame</td><td><code>data.frame()</code></td><td><code>data.frame(a=1:3, b=c("x","y","z"))</code></td></tr>' +
+  '<tr><td>Estructura</td><td><code>str(df)</code></td><td>Muestra tipos de cada columna</td></tr>' +
+  '<tr><td>Resumen</td><td><code>summary(df)</code></td><td>Estadísticas de cada columna</td></tr>' +
+  '<tr><td>Primeras filas</td><td><code>head(df)</code></td><td><code>head(df, 10)</code> para ver 10</td></tr>' +
+  '<tr><td>Últimas filas</td><td><code>tail(df)</code></td><td></td></tr>' +
+  '<tr><td>N° de filas / columnas</td><td><code>nrow(df)</code> / <code>ncol(df)</code></td><td></td></tr>' +
+  '<tr><td>Nombres de columnas</td><td><code>names(df)</code></td><td>o <code>colnames(df)</code></td></tr>' +
+  '<tr><td>Acceder a columna</td><td><code>df$columna</code></td><td><code>datos$edad</code></td></tr>' +
+  '<tr><td>Filtrar filas</td><td><code>df[condición, ]</code></td><td><code>df[df$edad &gt; 40, ]</code></td></tr>' +
+  '<tr><td>Añadir columna</td><td><code>df$nueva &lt;- valores</code></td><td></td></tr>' +
+  '<tr><td>Ver en visor</td><td><code>View(df)</code></td><td>Abre tabla interactiva en RStudio</td></tr></table></div>' +
+
+  '<div class="content-section"><h3>📂 Importar y exportar datos</h3>' +
+  '<table class="shortcuts-table"><tr><th>Acción</th><th>Comando</th><th>Nota</th></tr>' +
+  '<tr><td>Leer CSV (coma)</td><td><code>read.csv("archivo.csv")</code></td><td>Separador: coma, decimal: punto</td></tr>' +
+  '<tr><td>Leer CSV (punto y coma)</td><td><code>read.csv2("archivo.csv")</code></td><td>Separador: ;  decimal: coma (España)</td></tr>' +
+  '<tr><td>Leer Excel</td><td><code>read_excel("archivo.xlsx")</code></td><td>Requiere <code>library(readxl)</code></td></tr>' +
+  '<tr><td>Guardar CSV</td><td><code>write.csv(df, "salida.csv")</code></td><td></td></tr>' +
+  '<tr><td>Guardar CSV (;)</td><td><code>write.csv2(df, "salida.csv")</code></td><td>Formato español</td></tr>' +
+  '<tr><td>Directorio actual</td><td><code>getwd()</code></td><td></td></tr></table></div>' +
+
+  '<div class="content-section"><h3>📦 Paquetes</h3>' +
+  '<table class="shortcuts-table"><tr><th>Acción</th><th>Comando</th><th>Nota</th></tr>' +
+  '<tr><td>Instalar paquete</td><td><code>install.packages("nombre")</code></td><td>Con comillas. Solo 1 vez.</td></tr>' +
+  '<tr><td>Cargar paquete</td><td><code>library(nombre)</code></td><td>Sin comillas. Cada sesión.</td></tr>' +
+  '<tr><td>Ver instalados</td><td><code>installed.packages()</code></td><td></td></tr>' +
+  '<tr><td>Actualizar</td><td><code>update.packages()</code></td><td></td></tr></table></div>' +
+
+  '<div class="content-section"><h3>📊 Gráficos (R base)</h3>' +
+  '<table class="shortcuts-table"><tr><th>Gráfico</th><th>Comando</th><th>Uso</th></tr>' +
+  '<tr><td>Histograma</td><td><code>hist(x)</code></td><td>Distribución de variable numérica</td></tr>' +
+  '<tr><td>Barras</td><td><code>barplot(table(x))</code></td><td>Frecuencias de variable categórica</td></tr>' +
+  '<tr><td>Boxplot</td><td><code>boxplot(x)</code></td><td>Caja y bigotes</td></tr>' +
+  '<tr><td>Dispersión</td><td><code>plot(x, y)</code></td><td>Relación entre 2 variables</td></tr></table>' +
+  '<p style="margin-top:.6rem"><strong>Argumentos comunes:</strong> <code>main</code> (título), <code>xlab</code>/<code>ylab</code> (ejes), <code>col</code> (color), <code>pch</code> (tipo de punto)</p></div>' +
+
+  '<div class="content-section"><h3>🎨 Gráficos con ggplot2</h3>' +
+  '<table class="shortcuts-table"><tr><th>Elemento</th><th>Comando</th><th>Descripción</th></tr>' +
+  '<tr><td>Iniciar gráfico</td><td><code>ggplot(df, aes(x, y))</code></td><td>Define datos y ejes</td></tr>' +
+  '<tr><td>Puntos</td><td><code>+ geom_point()</code></td><td>Dispersión</td></tr>' +
+  '<tr><td>Líneas</td><td><code>+ geom_line()</code></td><td>Gráfico de líneas</td></tr>' +
+  '<tr><td>Barras</td><td><code>+ geom_bar()</code></td><td>Diagrama de barras</td></tr>' +
+  '<tr><td>Histograma</td><td><code>+ geom_histogram()</code></td><td>Histograma</td></tr>' +
+  '<tr><td>Boxplot</td><td><code>+ geom_boxplot()</code></td><td>Caja y bigotes</td></tr>' +
+  '<tr><td>Títulos</td><td><code>+ labs(title, x, y)</code></td><td>Etiquetas</td></tr>' +
+  '<tr><td>Tema limpio</td><td><code>+ theme_minimal()</code></td><td>Fondo limpio</td></tr>' +
+  '<tr><td>Guardar</td><td><code>ggsave("nombre.png")</code></td><td>Guarda último gráfico</td></tr></table></div>' +
+
+  '<div class="content-section"><h3>🔧 Texto (strings)</h3>' +
+  '<table class="shortcuts-table"><tr><th>Función</th><th>Descripción</th><th>Ejemplo</th></tr>' +
+  '<tr><td><code>paste()</code></td><td>Concatenar con espacio</td><td><code>paste("Hola", "Mundo")</code></td></tr>' +
+  '<tr><td><code>paste0()</code></td><td>Concatenar sin espacio</td><td><code>paste0("A", "B")</code> → "AB"</td></tr>' +
+  '<tr><td><code>nchar(x)</code></td><td>N° de caracteres</td><td><code>nchar("hola")</code> → 4</td></tr>' +
+  '<tr><td><code>toupper(x)</code></td><td>A mayúsculas</td><td><code>toupper("hola")</code> → "HOLA"</td></tr>' +
+  '<tr><td><code>tolower(x)</code></td><td>A minúsculas</td><td><code>tolower("HOLA")</code> → "hola"</td></tr>' +
+  '<tr><td><code>gsub(a, b, x)</code></td><td>Reemplazar texto</td><td><code>gsub("a","o","casa")</code> → "coso"</td></tr></table></div>' +
+
+  '<div class="content-section"><h3>🔁 Estructuras de control</h3>' +
+  codeBlock('R','<span class="cm"># Condicional if/else</span>\n<span class="kw">if</span> (edad <span class="op">&gt;=</span> <span class="num">18</span>) {\n  <span class="fn">print</span>(<span class="st">"Mayor de edad"</span>)\n} <span class="kw">else</span> {\n  <span class="fn">print</span>(<span class="st">"Menor de edad"</span>)\n}\n\n<span class="cm"># Bucle for</span>\n<span class="kw">for</span> (i <span class="kw">in</span> <span class="num">1</span><span class="op">:</span><span class="num">5</span>) {\n  <span class="fn">print</span>(i)\n}\n\n<span class="cm"># Crear una función propia</span>\ncalcular_imc <span class="op">&lt;-</span> <span class="kw">function</span>(peso, altura_cm) {\n  imc <span class="op">&lt;-</span> peso <span class="op">/</span> (altura_cm <span class="op">/</span> <span class="num">100</span>)<span class="op">^</span><span class="num">2</span>\n  <span class="fn">return</span>(<span class="fn">round</span>(imc, <span class="num">1</span>))\n}\n\n<span class="fn">calcular_imc</span>(<span class="num">70</span>, <span class="num">175</span>)  <span class="cm"># → 22.9</span>') + '</div>' +
+
+  '<div class="content-section"><h3>❓ Ayuda y utilidades</h3>' +
+  '<table class="shortcuts-table"><tr><th>Acción</th><th>Comando</th></tr>' +
+  '<tr><td>Ayuda de función</td><td><code>?funcion</code> o <code>help(funcion)</code></td></tr>' +
+  '<tr><td>Buscar por tema</td><td><code>??tema</code></td></tr>' +
+  '<tr><td>Ver ejemplo</td><td><code>example(funcion)</code></td></tr>' +
+  '<tr><td>Imprimir resultado</td><td><code>print(x)</code></td></tr>' +
+  '<tr><td>Detener ejecución</td><td><span class="kbd">Esc</span></td></tr></table></div>' +
+
+  '<div class="content-section"><h3>⌨️ Atajos de RStudio imprescindibles</h3>' +
+  '<table class="shortcuts-table"><tr><th>Acción</th><th>Windows / Linux</th><th>Mac</th></tr>' +
+  '<tr><td>Asignación <code>&lt;-</code></td><td><span class="kbd">Alt</span>+<span class="kbd">-</span></td><td><span class="kbd">Option</span>+<span class="kbd">-</span></td></tr>' +
+  '<tr><td>Ejecutar línea</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Enter</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">Enter</span></td></tr>' +
+  '<tr><td>Ejecutar script entero</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">Enter</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">Shift</span>+<span class="kbd">Enter</span></td></tr>' +
+  '<tr><td>Nuevo script</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">N</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">Shift</span>+<span class="kbd">N</span></td></tr>' +
+  '<tr><td>Guardar</td><td><span class="kbd">Ctrl</span>+<span class="kbd">S</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">S</span></td></tr>' +
+  '<tr><td>Comentar línea</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">C</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">Shift</span>+<span class="kbd">C</span></td></tr>' +
+  '<tr><td>Autocompletar</td><td><span class="kbd">Tab</span></td><td><span class="kbd">Tab</span></td></tr>' +
+  '<tr><td>Pipe <code>|&gt;</code></td><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">M</span></td><td><span class="kbd">Cmd</span>+<span class="kbd">Shift</span>+<span class="kbd">M</span></td></tr></table></div>';
+}}
+
+}; // Fin de lessons
+
+// ── Lógica de la app ──
+var allLessons = ['welcome','m1','m2','m3','m4','m5','m6','m7','m8','m9','m10','m11','m12','m13','m14','m15','ref'];
+var currentLesson = 'welcome';
+
+function getProgress() { try { return JSON.parse(localStorage.getItem('rtutor_progress') || '{}'); } catch(e) { return {}; } }
+function saveProgress(p) { localStorage.setItem('rtutor_progress', JSON.stringify(p)); }
+
+function updateProgressUI() {
+  var p = getProgress(), done = 0;
+  allLessons.forEach(function(id) {
+    var el = document.getElementById('check-' + id);
+    if (el) { if (p[id]) { el.classList.add('done'); done++; } else { el.classList.remove('done'); } }
+  });
+  var pct = Math.round((done / allLessons.length) * 100);
+  document.getElementById('progressPercent').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function markComplete(lessonId) {
+  var p = getProgress(); p[lessonId] = true; saveProgress(p); updateProgressUI();
+}
+
+function goTo(lessonId) {
+  var lesson = lessons[lessonId];
+  if (!lesson) return;
+  var currentIdx = allLessons.indexOf(currentLesson);
+  if (currentIdx >= 0) markComplete(currentLesson);
+  currentLesson = lessonId;
+  document.querySelectorAll('.sidebar-item').forEach(function(el) {
+    el.classList.toggle('active', el.dataset.lesson === lessonId);
+  });
+  var idx = allLessons.indexOf(lessonId);
+  var prevId = idx > 0 ? allLessons[idx - 1] : null;
+  var nextId = idx < allLessons.length - 1 ? allLessons[idx + 1] : null;
+  var navHTML = '<div class="lesson-nav">';
+  if (prevId) { navHTML += '<button class="btn btn-secondary" onclick="goTo(\'' + prevId + '\')">← Anterior</button>'; }
+  else { navHTML += '<div></div>'; }
+  if (nextId) { navHTML += '<button class="btn btn-primary" onclick="markComplete(\'' + lessonId + '\'); goTo(\'' + nextId + '\')">Siguiente →</button>'; }
+  else { navHTML += '<button class="btn btn-success" onclick="markComplete(\'' + lessonId + '\')">✓ Completar curso</button>'; }
+  navHTML += '</div>';
+  var mc = document.getElementById('mainContent');
+  mc.innerHTML = '<div class="lesson-header"><span class="module-tag">' + lesson.tag + '</span><h2>' + lesson.title + '</h2><p class="lesson-desc">' + lesson.desc + '</p></div>' + lesson.content() + navHTML;
+  mc.scrollTop = 0;
+  window.scrollTo(0, 0);
+  if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarBackdrop').classList.remove('show'); }
+}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarBackdrop').classList.toggle('show'); }
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal-overlay').forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.remove('show'); }); });
+
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('btn-copy')) {
+    var code = e.target.closest('.code-block').querySelector('pre').textContent;
+    navigator.clipboard.writeText(code).then(function() {
+      e.target.textContent = '✓ Copiado'; e.target.classList.add('copied');
+      setTimeout(function() { e.target.textContent = 'Copiar'; e.target.classList.remove('copied'); }, 2000);
+    });
+  }
+  var opt = e.target.closest('.quiz-option');
+  if (opt && !opt.classList.contains('disabled')) {
+    var container = opt.closest('.quiz-container');
+    var options = container.querySelectorAll('.quiz-option');
+    var feedback = container.querySelector('.quiz-feedback');
+    var isCorrect = opt.dataset.correct === 'true';
+    options.forEach(function(o) { o.classList.add('disabled'); });
+    if (isCorrect) {
+      opt.classList.add('correct');
+      feedback.className = 'quiz-feedback show correct';
+      feedback.textContent = '✓ ' + container.dataset.explanation;
+    } else {
+      opt.classList.add('incorrect');
+      options.forEach(function(o) { if (o.dataset.correct === 'true') o.classList.add('correct'); });
+      feedback.className = 'quiz-feedback show incorrect';
+      feedback.textContent = '✗ Incorrecto. ' + container.dataset.explanation;
+    }
+  }
+});
+
+updateProgressUI();
+goTo('welcome');
+
+// ── PWA: Service Worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js').then(function(reg) {
+      console.log('Service Worker registrado:', reg.scope);
+    }).catch(function(err) {
+      console.log('Service Worker error:', err);
+    });
+  });
+}
+
+// ── PWA: Banner de instalación ──
+var deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  if (document.getElementById('pwa-install-banner')) return;
+  var banner = document.createElement('div');
+  banner.id = 'pwa-install-banner';
+  banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1a5276,#2980b9);color:#fff;padding:1rem 1.2rem;display:flex;align-items:center;gap:1rem;z-index:2000;box-shadow:0 -2px 12px rgba(0,0,0,.2);font-size:.92rem;';
+  banner.innerHTML = '<span style="flex:1">📱 <strong>Instalar Tutor R</strong> como aplicación para acceder más rápido y sin conexión</span>' +
+    '<button onclick="installPWA()" style="background:#fff;color:#1a5276;border:none;padding:.5rem 1rem;border-radius:6px;font-weight:600;cursor:pointer;white-space:nowrap">Instalar</button>' +
+    '<button onclick="dismissInstallBanner()" style="background:none;border:none;color:rgba(255,255,255,.7);font-size:1.3rem;cursor:pointer;padding:0 .3rem" title="Cerrar">✕</button>';
+  document.body.appendChild(banner);
+}
+
+function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(choice) {
+    deferredPrompt = null;
+    dismissInstallBanner();
+  });
+}
+
+function dismissInstallBanner() {
+  var b = document.getElementById('pwa-install-banner');
+  if (b) b.remove();
+}
+</script>
+</body>
+</html>
