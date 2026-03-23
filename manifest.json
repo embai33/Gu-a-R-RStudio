@@ -2,7 +2,7 @@
   "name": "Tutor R & RStudio — Aprende desde cero",
   "short_name": "Tutor R",
   "description": "Tutor interactivo para aprender R y RStudio desde cero, orientado a profesionales de ciencias de la salud",
-  "start_url": "./tutor_R_RStudio.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

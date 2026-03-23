@@ -2,7 +2,7 @@
 const CACHE_NAME = 'tutor-r-v1';
 const ASSETS = [
   './',
-  './tutor_R_RStudio.html',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
@@ -41,7 +41,7 @@ self.addEventListener('fetch', event => {
       });
     }).catch(() => {
       // Fallback offline: devolver la página principal
-      return caches.match('./tutor_R_RStudio.html');
+      return caches.match('./index.html');
     })
   );
 });
